@@ -1,0 +1,9 @@
+*.class
+*.log
+.idea/
+target/
+project/target/
+public/javascripts/node_modules/
+public/javascripts/dist/
+public/javascripts/*.js
+!public/javascripts/webpack.config.js
