@@ -11,6 +11,15 @@
     -moz-opacity: 0.3;
     opacity: 0.3;
 }
+.clickBoxes {
+    stroke-width:2px;
+    stroke:#333333;
+    fill:whitesmoke;
+}
+.clickTexts {
+    font-family: sans-serif;
+
+}
 .matomeTexts {
     font-family: sans-serif;
 }
@@ -24,4 +33,12 @@
     -moz-opacity: 0.7;
     opacity: 0.7;
     stroke-width:2px;
+}
+.clickLinks {
+    fill: none;
+    stroke: black;
+    stroke-width:2px;
+}
+.clickBgRect {
+    fill: rgba(255, 255, 255, 0.9);
 }

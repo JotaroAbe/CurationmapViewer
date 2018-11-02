@@ -127,11 +127,49 @@ export class Document{
         });
         return ret;
     }
+    getDetailTextSvgDataFromFragUuid(uuid: string):[string, number, string][]{//text,先頭を0としたときのy座標,destUuid
+        const ret: [string, number, string][] = [];
+        const destUuids: string[] = this.getLinkDestUuidsFromFragUuid(uuid);
+        let currentY: number = 0;
+
+        destUuids.forEach(destUuid=>{
+            this.linkUuidTexts.forEach(uuidText => {
+                uuidText.lines.forEach(line => {
+                    if(destUuid == uuidText.uuid){
+                        ret.push([line.text, currentY, uuidText.uuid]);
+                        currentY += SvgDrawer.CHAR_SIZE;
+                    }
+                })
+            });
+            currentY += SvgDrawer.FRAG_MARGIN * SvgDrawer.CHAR_SIZE
+        });
+
+
+        return ret;
+
+    }
 
     getDetailBoxSvgData(): [number, number, string][]{
         const ret: [number, number, string][] = [];
         this.linkUuidTexts.forEach( uuidText => {
             ret.push([(uuidText.lines.length + SvgDrawer.FRAG_MARGIN - SvgDrawer.BOX_MARGIN)* SvgDrawer.CHAR_SIZE, uuidText.svgY - SvgDrawer.PADDING, uuidText.uuid]);
+        });
+
+        return ret;
+    }
+
+    getDetailBoxSvGDataFromFragUuid(uuid: string): [number, number, string][]{//height,先頭を0としたときのy座標,destUuid
+        const ret: [number, number, string][] = [];
+        const destUuids: string[] = this.getLinkDestUuidsFromFragUuid(uuid);
+        let currentY: number = 0;
+
+        destUuids.forEach(destUuid=>{
+            this.linkUuidTexts.forEach( uuidText => {
+                if(destUuid == uuidText.uuid) {
+                    ret.push([(uuidText.lines.length + SvgDrawer.FRAG_MARGIN - SvgDrawer.BOX_MARGIN) * SvgDrawer.CHAR_SIZE, currentY, uuidText.uuid]);
+                    currentY += uuidText.lines.length * SvgDrawer.CHAR_SIZE + SvgDrawer.FRAG_MARGIN * SvgDrawer.CHAR_SIZE;
+                }
+            });
         });
 
         return ret;
@@ -186,6 +224,18 @@ export class Document{
         this.linkUuidTexts.forEach(uuidText=> {
             if(uuidText.uuid == uuid){
                 ret = true;
+            }
+        });
+        return ret;
+    }
+
+    getLinkDestUuidsFromFragUuid(uuid: string): string[]{
+        const ret: string[] = [];
+         this.fragments.forEach(frag=>{
+            if(frag.uuid == uuid){
+                frag.links.forEach(link=>{
+                  ret.push(link.uuid);
+                })
             }
         });
         return ret;

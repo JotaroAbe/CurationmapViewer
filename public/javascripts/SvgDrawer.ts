@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import {Document} from "./Document";
+import {Axis, Document, LinkSvgData} from "./Document";
 import {CurationMap} from "./CurationMap";
 import $ from "jquery";
 
@@ -156,14 +156,12 @@ export class SvgDrawer{
         const svgG = svg.append('g')
             .attr("class", "matomeClicks");
 
-
         svgG.append("rect")
             .attr("class", "clickBgRect")
             .attr("x", 0)
             .attr("y", 0)
             .attr("width", SvgDrawer.SVG_WIDTH)
-            .attr("height", treeData.getSvgHeight())
-            .attr("fill", "rgba(0, 0, 0, 0.9)");
+            .attr("height", treeData.getSvgHeight());
 
         $(".matomeClicks").on("click",function () {
             $(this).remove();
@@ -171,25 +169,103 @@ export class SvgDrawer{
 
         const matomeTextData: [string, number][] = treeData.getMatomeTextSvgDataFromUuid(uuid);
 
-        const y: number = $(window).scrollTop() as number + window.innerHeight / 2 - matomeTextData.length * SvgDrawer.CHAR_SIZE;
+        const y: number = $(window).scrollTop() as number;
         const fragG = svgG.append('g')
             .attr("class", "matomeClickFrags");
         fragG.append("rect")
-            .attr("class", "matomeBoxes")
+            .attr("class", "clickBoxes")
             .attr("x", SvgDrawer.PADDING / 2)
             .attr("y", y)
             .attr("width", SvgDrawer.ONE_LINE_CHAR * SvgDrawer.CHAR_SIZE + SvgDrawer.PADDING / 2)
-            .attr("height", (matomeTextData.length + + SvgDrawer.FRAG_MARGIN - SvgDrawer.BOX_MARGIN) * SvgDrawer.CHAR_SIZE);
+            .attr("height", (matomeTextData.length + SvgDrawer.FRAG_MARGIN - SvgDrawer.BOX_MARGIN) * SvgDrawer.CHAR_SIZE);
 
+        const matomeLinkSvgY = y + ((matomeTextData.length + SvgDrawer.FRAG_MARGIN - SvgDrawer.BOX_MARGIN) * SvgDrawer.CHAR_SIZE ) / 2;
 
         fragG.selectAll("clickmatometext")
             .data(matomeTextData)
             .enter()
             .append("text")
-            .attr("class", "matomeTexts")
+            .attr("class", "clickTexts")
             .text((d:[string, number]) => d[0])//text
             .attr("x", SvgDrawer.PADDING)
             .attr("y", (d:[string, number])  => y + d[1] + SvgDrawer.CHAR_SIZE)//svgY
             .attr("font-size", SvgDrawer.CHAR_SIZE + "px");
+
+        const detailFragGs = svgG.append('g')
+            .attr("class", "detailClickFrags");
+
+        const detailBoxSvgData = treeData.getDetailBoxSvGDataFromFragUuid(uuid);
+        const detailTextSvgData = treeData.getDetailTextSvgDataFromFragUuid(uuid);
+
+        const detailLinkSvgYs: number[] = [];
+
+        detailBoxSvgData.forEach(boxData=>{
+            const detailFragG = detailFragGs.append('g')
+                .attr("class", "simpleDetailClickFrags");
+
+            detailFragG.append("rect")
+                .attr("class", "clickBoxes")
+                .attr("x", SvgDrawer.SVG_WIDTH - SvgDrawer.ONE_LINE_CHAR * SvgDrawer.CHAR_SIZE - SvgDrawer.PADDING * 2)
+                .attr("y", y + boxData[1])
+                .attr("width", SvgDrawer.ONE_LINE_CHAR * SvgDrawer.CHAR_SIZE + SvgDrawer.PADDING / 2)
+                .attr("height", boxData[0]);
+
+            const simpleDetailTextSvgData: [string,number][] =[];
+            detailTextSvgData.forEach(textData=>{
+                if(boxData[2] == textData[2]){
+                    simpleDetailTextSvgData.push([textData[0], textData[1]]);
+                }
+            });
+
+            detailFragG.selectAll("clickdetailtext")
+                .data(simpleDetailTextSvgData)
+                .enter()
+                .append("text")
+                .attr("class", "clickTexts")
+                .text((d:[string, number]) => d[0])//text
+                .attr("x", SvgDrawer.SVG_WIDTH - SvgDrawer.ONE_LINE_CHAR * SvgDrawer.CHAR_SIZE - SvgDrawer.PADDING * 2)
+                .attr("y", (d:[string, number])  => y + d[1] + SvgDrawer.CHAR_SIZE)//svgY
+                .attr("font-size", SvgDrawer.CHAR_SIZE + "px");
+
+            detailLinkSvgYs.push(y + boxData[1] + boxData[0] / 2);
+        });
+
+        const linkSvgData: LinkSvgData[] =[];
+
+        detailLinkSvgYs.forEach(destSvgY =>{
+
+            const axises: Axis[] = [];
+
+            const x1 = SvgDrawer.ONE_LINE_CHAR * SvgDrawer.CHAR_SIZE + SvgDrawer.PADDING;
+            const y1 = matomeLinkSvgY;
+            const x2 = SvgDrawer.SVG_WIDTH- SvgDrawer.ONE_LINE_CHAR * SvgDrawer.CHAR_SIZE - SvgDrawer.PADDING * 2;
+            const y2 = destSvgY;
+
+            axises.push(new Axis(x1, y1));
+            axises.push(new Axis((x1 * 1.5 + x2 * 0.5) / 2, y1));
+            axises.push(new Axis((x1 * 0.5 + x2 * 1.5) / 2, y2));
+            axises.push(new Axis(x2, y2));
+
+            linkSvgData.push(new LinkSvgData(axises));
+        });
+
+
+        const linkSvgG = svgG.append('g')
+            .attr("class", "clickLinks");
+
+        const lineFunction = d3.line()
+            .x(d => d[0])
+            .y(d => d[1])
+            .curve(d3.curveBasis);
+
+        let i = 0;
+        linkSvgData.forEach(link =>{
+            linkSvgG.append("path")
+                .datum(link.getObject(i))
+                .attr("class", "clickLinks")
+                .attr("d", lineFunction);
+
+            i++;
+        });
     }
 }
