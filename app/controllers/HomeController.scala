@@ -1,18 +1,41 @@
 package controllers
 
+
 import dataStructures.morphias.MongoDatastoreFactory
 import javax.inject.Inject
-import org.mongodb.morphia._
+import models.Query
+import org.mongodb.morphia.Datastore
 import pipeline.CMapFinder
 import play.api.mvc.{AbstractController, ControllerComponents}
+import play.api.data._
+import play.api.data.Forms._
+import play.api.i18n.I18nSupport
 
 
 class HomeController  @Inject()(cc: ControllerComponents) (implicit assetsFinder: AssetsFinder)
-  extends AbstractController(cc) {
+  extends AbstractController(cc) with I18nSupport{
 
   var dsOpt = Option.empty[Datastore]
 
-  def index = Action {
+  val queryForm = Form( mapping(
+    "query" -> nonEmptyText
+  )(Query.apply)(Query.unapply)
+  )
+
+  def index = Action { implicit request =>
+
+    Ok(views.html.index(queryForm) )
+
+  }
+
+  def map = Action { implicit request =>
+
+    val queryOpt: Option[Query] = queryForm.bindFromRequest.value
+
+    val query: String = queryOpt match {
+      case Some(query: Query) => query.query
+      case _ => ""
+    }
 
     val ds : Datastore= dsOpt match {
       case Some(dataStore) => dataStore
@@ -21,9 +44,19 @@ class HomeController  @Inject()(cc: ControllerComponents) (implicit assetsFinder
         newDataStore
     }
 
-    val cMap : CMapFinder = CMapFinder("桜木町", ds)
+    val cMap : CMapFinder = CMapFinder(query, ds)
 
-    Ok(views.html.index(cMap.getCMapJson))
+    val jsonStr: String = cMap.getCMapJson
 
+    if(jsonStr != "{}"){
+      Ok(views.html.map(jsonStr, queryForm))
+    }else{
+      if(query.isEmpty){
+        Redirect("/")
+      }else{
+        BadRequest(s"「$query」に関するキュレーションマップはこのデータベース内にありません。")
+      }
+    }
   }
 }
+

@@ -1,2 +1,5 @@
 GET     /                      controllers.HomeController.index()
+GET     /map                   controllers.HomeController.map()
+POST    /query                 controllers.HomeController.map()
+
 GET     /assets/*file          controllers.Assets.at(file)

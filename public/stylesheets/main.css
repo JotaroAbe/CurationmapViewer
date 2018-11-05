@@ -3,6 +3,7 @@
     stroke-width:2px;
     stroke:#333333;
     fill:white;
+
 }
 
 .detailBoxes {
@@ -10,11 +11,13 @@
     filter:alpha(opacity=30);
     -moz-opacity: 0.3;
     opacity: 0.3;
+
 }
 .clickBoxes {
     stroke-width:2px;
     stroke:#333333;
     fill:whitesmoke;
+
 }
 .clickTexts {
     font-family: sans-serif;
