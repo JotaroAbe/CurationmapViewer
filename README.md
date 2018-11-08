@@ -12,3 +12,4 @@
 - [Jquery](https://jquery.com/)
 - CSS
 - [D3.js](https://d3js.org/)
+- [webpack](https://webpack.js.org/)
