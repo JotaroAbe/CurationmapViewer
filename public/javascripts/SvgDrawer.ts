@@ -47,6 +47,7 @@ export class SvgDrawer{
             const simpleMatomeFragSvgG = matomeFragsSvgG.append("g")
                 .attr("id", matomeBox[2]);
 
+
             const fragMatomeBox: [number, number, string][] = [];
             fragMatomeBox.push(matomeBox);
 
@@ -81,7 +82,8 @@ export class SvgDrawer{
         detailBoxSvgData.forEach(detailBox => {
 
             const simpleDetailFragSvgG = detailFragsSvgG.append("g")
-                .attr("id", detailBox[2]);
+                .attr("id", detailBox[2])
+                .attr("class", cMap.getHitsRankFromUuid(detailBox[2]));
 
             const fragDetailBox: [number, number, string][] = [];
             fragDetailBox.push(detailBox);
@@ -147,6 +149,17 @@ export class SvgDrawer{
                 $(this).children(".matomeBoxes").css("fill", "white");
             }
         });
+
+        $(".detailFrags").children().on({
+            "click" :function () {
+                const cl : string = $(this).attr("class") as string;
+                $("select").val(cl);
+                const num: number = parseInt(cl);
+                me.drawMainSvg(cMap,num);
+                $(window).scrollTop(0);
+            }
+        })
+
     }
 
     drawMatomeClickSvg(uuid: string, cMap: CurationMap, hubNum: number, svg: any): void{
@@ -201,7 +214,8 @@ export class SvgDrawer{
 
         detailBoxSvgData.forEach(boxData=>{
             const detailFragG = detailFragGs.append('g')
-                .attr("class", "simpleDetailClickFrags");
+                .attr("class", "simpleDetailClickFrags")
+                .attr("class", cMap.getHitsRankFromUuid(boxData[2]));
 
             detailFragG.append("rect")
                 .attr("class", "clickBoxes")
@@ -228,6 +242,17 @@ export class SvgDrawer{
                 .attr("font-size", SvgDrawer.CHAR_SIZE + "px");
 
             detailLinkSvgYs.push(y + boxData[1] + boxData[0] / 2);
+        });
+
+        const me: SvgDrawer = this;
+        $(".detailClickFrags").children().on({
+            "click" :function () {
+                const cl : string = $(this).attr("class") as string;
+                $("select").val(cl);
+                const num: number = parseInt(cl);
+                me.drawMainSvg(cMap,num);
+                $(window).scrollTop(0);
+            }
         });
 
         const linkSvgData: LinkSvgData[] =[];

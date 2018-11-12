@@ -40,6 +40,23 @@ export class CurationMap {
         return ret;
     }
 
+    getHitsRankFromUuid(uuid: string): number{
+        let ret: number = -1;
+        let i: number = 0;
+        this.documents.forEach(doc =>{
+            if(doc.uuid == uuid){
+                ret = i;
+            }
+            doc.fragments.forEach(frag =>{
+                if(frag.uuid == uuid){
+                    ret = i
+                }
+            });
+            i++;
+        });
+        return ret;
+    }
+
     calcDetailSvgY(): void{
         this.documents.forEach(doc =>{
             doc.calcDetailSvgY();

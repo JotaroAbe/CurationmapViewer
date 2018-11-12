@@ -45,7 +45,7 @@ svgDrawer.drawMainSvg(cMap, 0);
 
 let i: number = 1;
 cMap.documents.forEach(doc=>{
-    const op = $("select").append("<option value="+(i - 1)+">"+i+ ":" +doc.getDocText().substr(0, 20)+"</option>").eq( i - 1 );
+    const op = $("select").append("<option value="+(i - 1)+">"+i+ ":" +doc.url+"</option>").eq( i - 1 );
     op.on("change", e=>svgDrawer.drawMainSvg(cMap,op.val() as number));
     i++;
 });

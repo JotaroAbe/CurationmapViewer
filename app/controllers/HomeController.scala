@@ -49,7 +49,7 @@ class HomeController  @Inject()(cc: ControllerComponents) (implicit assetsFinder
     val jsonStr: String = cMap.getCMapJson
 
     if(jsonStr != "{}"){
-      Ok(views.html.map(jsonStr, queryForm))
+      Ok(views.html.map(jsonStr,query , queryForm))
     }else{
       if(query.isEmpty){
         Redirect("/")

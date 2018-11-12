@@ -5,7 +5,7 @@
   "main": "main.js",
   "dependencies": {
     "@types/d3": "^5.0.0",
-    "@types/jquery": "^3.3.19",
+    "@types/jquery": "^3.3.22",
     "d3": "^5.7.0",
     "jquery": "^3.3.1",
     "tinysort": "^2.3.6"

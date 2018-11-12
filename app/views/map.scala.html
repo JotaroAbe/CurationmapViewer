@@ -1,9 +1,9 @@
-@(jsontext : String, queryForm: Form[Query])(implicit messages: Messages)
+@(jsontext : String, query: String ,queryForm: Form[Query])(implicit messages: Messages)
 <!DOCTYPE html>
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>キュレーションマップ</title>
+        <title>@query - キュレーションマップ</title>
         <link rel="stylesheet" type="text/css" href= "@routes.Assets.at("stylesheets/main.css")">
         <script type="module" src="@routes.Assets.at("javascripts/dist/main.js")"></script>
     </head>
@@ -11,9 +11,18 @@
         <p hidden id = "jsontext">@jsontext</p>
         @helper.form(action = routes.HomeController.map()) {
             @helper.inputText(queryForm("query"),'_label -> "キュレーションマップを検索", '_showConstraints -> false)
-            <input type="submit" value="検索">
+            <input type="submit" id="searchButton" value="検索">
         }
-        <select name="docNum">
+        <p>
+            検索ワード：　@query
+        </p>
+        <select name="docNum" id="docSelect">
         </select>　
+        <table width="100%" class="guideTable">
+            <tr>
+                <th align="left">まとめ文書</th>
+                <th align="right">詳細文章群</th>
+            </tr>
+        </table>
     </body>
 </html>
