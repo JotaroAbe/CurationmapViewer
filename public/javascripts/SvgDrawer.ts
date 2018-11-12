@@ -22,6 +22,8 @@ export class SvgDrawer{
         const svgWidth = SvgDrawer.SVG_WIDTH;
         const svgHeight = treeData.getSvgHeight();
 
+        $("#matomeDocUrl").html("<a target=\"_blank\" href=\""+treeData.url+"\">" + treeData.title + "</a>");
+
         d3.select("svg").remove();
 
         const svg = d3.select("body")

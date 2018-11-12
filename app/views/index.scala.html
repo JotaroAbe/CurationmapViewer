@@ -9,7 +9,7 @@
     <body>
         @helper.form(action = routes.HomeController.map()) {
                 @helper.inputText(queryForm("query"),'_label -> "キュレーションマップを検索", '_showConstraints -> false)
-                <input type="submit" value="検索">
+                <input type="submit" id="searchButton" value="検索">
         }
     </body>
 </html>

@@ -4,14 +4,16 @@ import {UuidTextPair} from "./UuidTextPair";
 
 export class Document{
     url : string;
+    title: string;
     fragments : Fragment[];
     docNum: number;
     uuid: string;
 
     linkUuidTexts: UuidTextPair[] = [];
 
-    constructor(url :string, docNum: number, frags : Fragment[], uuid: string){
+    constructor(url: string, title: string,  docNum: number, frags : Fragment[], uuid: string){
         this.url = url;
+        this.title = title;
         this.docNum = docNum;
         this.fragments = frags;
         this.uuid = uuid;

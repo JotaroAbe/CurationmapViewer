@@ -33,7 +33,7 @@ for(const doc of map.documents) {
         }
         frags.push(new Fragment(frag.text, links, frag.uuid));
     }
-    docs.push(new Document(doc.url, doc.docNum, frags, doc.uuid));
+    docs.push(new Document(doc.url,doc.title, doc.docNum, frags, doc.uuid));
 }
 
 const cMap: CurationMap = new CurationMap(docs);
@@ -45,7 +45,7 @@ svgDrawer.drawMainSvg(cMap, 0);
 
 let i: number = 1;
 cMap.documents.forEach(doc=>{
-    const op = $("select").append("<option value="+(i - 1)+">"+i+ ":" +doc.url+"</option>").eq( i - 1 );
+    const op = $("select").append("<option value="+(i - 1)+">"+i+ ":" +doc.title+"</option>").eq( i - 1 );
     op.on("change", e=>svgDrawer.drawMainSvg(cMap,op.val() as number));
     i++;
 });

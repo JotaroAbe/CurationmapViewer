@@ -17,7 +17,7 @@ export class CurationMap {
                 doc.fragments.forEach(frag => {
                     frag.links.forEach(link => {
                         if(!doc.hasFragTextInLinkUuidTexts(link.uuid)){
-                            doc.linkUuidTexts.push(new UuidTextPair(link.uuid, this.getTextFromUuid(link.uuid), this.getDocUrl(link.destDocNum)));
+                            doc.linkUuidTexts.push(new UuidTextPair(link.uuid, this.getTextFromUuid(link.uuid), this.getDocUrl(link.destDocNum), this.getDocTitle(link.destDocNum)));
                         }
                     })
                 });
@@ -68,6 +68,15 @@ export class CurationMap {
         this.documents.forEach(doc=>{
             if(doc.docNum == docNum){
                 ret = doc.url;
+            }
+        });
+        return ret;
+    }
+    getDocTitle(docNum: number): string{
+        let ret = "";
+        this.documents.forEach(doc=>{
+            if(doc.docNum == docNum){
+                ret = doc.title;
             }
         });
         return ret;
