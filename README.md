@@ -9,7 +9,7 @@
 - [jsoup](https://jsoup.org/)
 - HTML5
 - TypeScript
-- [Jquery](https://jquery.com/)
+- [jQuery](https://jquery.com/)
 - CSS
 - [D3.js](https://d3js.org/)
 - [webpack](https://webpack.js.org/)
