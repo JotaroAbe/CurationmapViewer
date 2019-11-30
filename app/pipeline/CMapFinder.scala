@@ -1,22 +1,39 @@
 package pipeline
 
 import dataStructures.jsons.CurationMapJson
-import dataStructures.morphias.CurationMapMorphia
+import dataStructures.morphias.{CurationMapMorphia, Morphia2Scala}
+import models.CurationMap
 import org.mongodb.morphia.Datastore
 import org.mongodb.morphia.query.Query
 import play.api.libs.json.Json
 
-case class CMapFinder(query: String, ds: Datastore) {
+case class CMapFinder(query: String, alpha: Double, beta : Double, ds: Datastore) {
   val res: Query[CurationMapMorphia] = ds.createQuery(classOf[CurationMapMorphia]).field("query").equal(query)
-  var cMapJsonOpt = Option.empty[CurationMapJson]
 
-  if(res.count() != 0){
-    cMapJsonOpt = Option(res.get().toJson)
 
-  }
+ def getCurationMap: Option[CurationMap] = {
+   if(res.count() != 0){
+     Some(Option(res.get()) match {
+       case Some(cmap : CurationMapMorphia) =>
+         val ret = Morphia2Scala().convert(cmap, alpha, beta)
+         ret.deleteWeakLink()
+         ret.genSplitLink()
+         ret.mergeLink()
+         ret.calcHits()
+         ret
+       case _ => null
+     })
+   }else{
+     None
+   }
+ }
+
+
   def getCMapJson: String ={
-    cMapJsonOpt match {
-      case Some(v) => Json.toJson(v).toString()
+
+    getCurationMap match {
+      case Some(cmap : CurationMap) =>
+        Json.toJson(cmap.toJson).toString()
       case _ => "{}"
     }
   }

@@ -2,4 +2,6 @@ GET     /                      controllers.HomeController.index()
 GET     /map                   controllers.HomeController.map()
 POST    /query                 controllers.HomeController.map()
 
+GET     /getmap                controllers.HomeController.getMap()
+
 GET     /assets/*file          controllers.Assets.at(file)
