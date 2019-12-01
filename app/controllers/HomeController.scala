@@ -1,9 +1,8 @@
 package controllers
 
-
 import dataStructures.morphias.MongoDatastoreFactory
 import javax.inject.Inject
-import models.Query
+import models.{CurationMap, Query}
 import org.mongodb.morphia.Datastore
 import pipeline.CMapFinder
 import play.api.mvc.{AbstractController, ControllerComponents}
@@ -44,12 +43,10 @@ class HomeController  @Inject()(cc: ControllerComponents) (implicit assetsFinder
         newDataStore
     }
 
-    val cMap : CMapFinder = CMapFinder(query,0.6,0.6, ds)
+    val cMapF : CMapFinder = CMapFinder(query, CurationMap.DEFAULT_ALPHA, CurationMap.DEFAULT_BETA, ds)
 
-    val jsonStr: String = cMap.getCMapJson
-
-    if(jsonStr != "{}"){
-      Ok(views.html.map(jsonStr,query , queryForm))
+    if(cMapF.isNonEmpty){
+      Ok(views.html.map(query , queryForm))
     }else{
       if(query.isEmpty){
         Redirect("/")
@@ -61,17 +58,17 @@ class HomeController  @Inject()(cc: ControllerComponents) (implicit assetsFinder
 
   def getMap= Action { implicit request =>
 
-    val query: String = request.headers.get("query") match {
-      case Some(q: String ) => q
+    val query: String = request.getQueryString("query") match {
+      case Some(q: String) => q
       case _ => ""
     }
-    val alpha: Double = request.headers.get("alpha") match {
+    val alpha: Double = request.getQueryString("alpha") match {
       case Some(a: String) =>
         a.toDoubleOrElse()
       case _ => -1D
     }
 
-    val beta: Double = request.headers.get("beta") match {
+    val beta: Double = request.getQueryString("beta") match {
       case Some(b: String) =>
         b.toDoubleOrElse()
       case _ => -1D
@@ -88,9 +85,7 @@ class HomeController  @Inject()(cc: ControllerComponents) (implicit assetsFinder
 
       val cMap : CMapFinder = CMapFinder(query, alpha, beta, ds)
 
-      val jsonStr: String = cMap.getCMapJson
-
-      Ok(jsonStr)
+      Ok(cMap.getCMapJson)
     }else{
       BadRequest("Header Error")
     }
@@ -105,12 +100,12 @@ class HomeController  @Inject()(cc: ControllerComponents) (implicit assetsFinder
       case _: NumberFormatException => defaultVal
     }
 
-    def toShortOrElse(defaultVal: Short = 0) = toTypeOrElse[Short](_.toShort, defaultVal)
-    def toByteOrElse(defaultVal: Byte = 0) = toTypeOrElse[Byte](_.toByte, defaultVal)
-    def toIntOrElse(defaultVal: Int = 0) = toTypeOrElse[Int](_.toInt, defaultVal)
-    def toDoubleOrElse(defaultVal: Double = -1D) = toTypeOrElse[Double](_.toDouble, defaultVal)
-    def toLongOrElse(defaultVal: Long = 0L) = toTypeOrElse[Long](_.toLong, defaultVal)
-    def toFloatOrElse(defaultVal: Float = 0F) = toTypeOrElse[Float](_.toFloat, defaultVal)
+    def toShortOrElse(defaultVal: Short = 0): Short = toTypeOrElse[Short](_.toShort, defaultVal)
+    def toByteOrElse(defaultVal: Byte = 0): Byte = toTypeOrElse[Byte](_.toByte, defaultVal)
+    def toIntOrElse(defaultVal: Int = 0): Int = toTypeOrElse[Int](_.toInt, defaultVal)
+    def toDoubleOrElse(defaultVal: Double = -1D): Double = toTypeOrElse[Double](_.toDouble, defaultVal)
+    def toLongOrElse(defaultVal: Long = 0L): Long = toTypeOrElse[Long](_.toLong, defaultVal)
+    def toFloatOrElse(defaultVal: Float = 0F): Float = toTypeOrElse[Float](_.toFloat, defaultVal)
   }
 
 }

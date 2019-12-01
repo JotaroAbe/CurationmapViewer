@@ -6,9 +6,11 @@
   "dependencies": {
     "@types/d3": "^5.0.0",
     "@types/jquery": "^3.3.22",
+    "@types/uuid": "^3.4.6",
     "d3": "^5.7.0",
     "jquery": "^3.4.0",
-    "tinysort": "^2.3.6"
+    "tinysort": "^2.3.6",
+    "uuid": "^3.3.3"
   },
   "devDependencies": {
     "ts-loader": "^5.2.1",

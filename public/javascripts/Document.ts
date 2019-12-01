@@ -20,7 +20,6 @@ export class Document{
         this.setFragLine();
         this.calcMatomeSvgY();
     }
-
     setFragLine(): void{
         this.fragments.forEach(frag => {
             frag.setLine()

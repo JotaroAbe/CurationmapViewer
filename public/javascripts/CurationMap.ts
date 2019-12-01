@@ -11,13 +11,17 @@ export class CurationMap {
         this.calcDetailSvgY();
     }
 
+
+
     setLinkUuidTexts(){
         this.documents.forEach(doc =>{
             if(doc.linkUuidTexts.length == 0) {
                 doc.fragments.forEach(frag => {
                     frag.links.forEach(link => {
                         if(!doc.hasFragTextInLinkUuidTexts(link.uuid)){
-                            doc.linkUuidTexts.push(new UuidTextPair(link.uuid, this.getTextFromUuid(link.uuid), this.getDocUrl(link.destDocNum), this.getDocTitle(link.destDocNum)));
+                            doc.linkUuidTexts.push(new UuidTextPair(link.uuid,
+                                (this.getHitsRankFromUuid(link.uuid) + 1).toString() + ".",
+                                this.getDocUrl(link.destDocNum), this.getDocTitle(link.destDocNum)));
                         }
                     })
                 });

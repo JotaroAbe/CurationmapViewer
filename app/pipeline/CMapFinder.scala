@@ -5,10 +5,14 @@ import dataStructures.morphias.{CurationMapMorphia, Morphia2Scala}
 import models.CurationMap
 import org.mongodb.morphia.Datastore
 import org.mongodb.morphia.query.Query
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 
 case class CMapFinder(query: String, alpha: Double, beta : Double, ds: Datastore) {
   val res: Query[CurationMapMorphia] = ds.createQuery(classOf[CurationMapMorphia]).field("query").equal(query)
+
+  def isNonEmpty: Boolean ={
+    res.count() != 0
+  }
 
 
  def getCurationMap: Option[CurationMap] = {
@@ -29,12 +33,12 @@ case class CMapFinder(query: String, alpha: Double, beta : Double, ds: Datastore
  }
 
 
-  def getCMapJson: String ={
+  def getCMapJson: JsValue ={
 
     getCurationMap match {
       case Some(cmap : CurationMap) =>
-        Json.toJson(cmap.toJson).toString()
-      case _ => "{}"
+        Json.toJson(cmap.toJson)
+      case _ => Json.toJson("{}")
     }
   }
 }
