@@ -7,10 +7,10 @@ import org.apache.lucene.search.Weight
 import scala.collection.immutable.List
 import scala.collection.mutable
 
-case class Fragment (morphList: Vector[Morpheme]){
+case class Fragment (morphList: Vector[Morpheme], uuid :UUID = UUID.randomUUID){
 
   var docNum : Int = Document.docNumNone
-  //val uuid :UUID = UUID.randomUUID
+
   var links: mutable.MutableList[InclusiveLink] = mutable.MutableList.empty[InclusiveLink]
 
   def getText: String ={
@@ -89,7 +89,7 @@ case class Fragment (morphList: Vector[Morpheme]){
 
 
   def +(rearFrag : Fragment) :Fragment ={
-    val mergedFrag = Fragment(Vector.concat(morphList, rearFrag.morphList))
+    val mergedFrag = Fragment(Vector.concat(morphList, rearFrag.morphList), this.uuid)
 
     mergedFrag.docNum = docNum
     this.links.foreach{

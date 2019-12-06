@@ -17,6 +17,7 @@ export class SvgDrawer{
 
     drawMainSvg(cMap: CurationMap, hubNum: number): void{
 
+        cMap.init();
         const treeData: Document = cMap.documents[hubNum];
 
         const svgWidth = SvgDrawer.SVG_WIDTH;
@@ -141,7 +142,29 @@ export class SvgDrawer{
         $(".matomeFrags").children().on({
             "click" :function () {
                 const cl : string = $(this).attr("id") as string;
+
+                const destuuids = cMap.getLinkUuidFromUuid(cl);
+                destuuids.forEach( du =>{
+                    $.ajax("getdestfrag",
+                        {
+                            type:"GET",
+                            data:{
+                                frag : cl,
+                                destdoc : du
+                            },
+                            async : false
+                        })
+                        .done(function (data) {
+                            cMap.setTextOfUuidTextPairFromUuid(du, data);
+                        })
+                        .fail(function (data) {
+                            console.log(data)
+                        });
+                });
+
+
                 me.drawMatomeClickSvg(cl, cMap, hubNum, svg);
+
             },
             "mouseenter" :function () {
                 $(this).children(".matomeBoxes").css("fill", "darkgray");
@@ -157,6 +180,7 @@ export class SvgDrawer{
                 const cl : string = $(this).attr("class") as string;
                 $("select").val(cl);
                 const num: number = parseInt(cl);
+
                 me.drawMainSvg(cMap,num);
                 $(window).scrollTop(0);
             }

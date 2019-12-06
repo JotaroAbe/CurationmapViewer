@@ -72,7 +72,7 @@ body{
 #query:focus {
     border:solid 1px gray;
 }
-#searchButton{
+#searchButton, #reloadButton{
     position: relative;
     top: -57px;
     left: 350px;
@@ -101,4 +101,7 @@ body{
 }
 #docSelect{
     width: 42%;
+}
+.param{
+    display: inline
 }

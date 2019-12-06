@@ -6,7 +6,7 @@ import tools.LinkMerger
 
 import scala.collection.mutable
 
-case class Document (url: String, title: String, var fragList : Vector[Fragment],var docNum : Int){
+case class Document (url: String, title: String, var fragList : Vector[Fragment],var docNum : Int, uuid :UUID = UUID.randomUUID){
   val initHub : Double = 1
   val initAuth : Double = 1
   var preHub : Double = initHub
@@ -15,7 +15,6 @@ case class Document (url: String, title: String, var fragList : Vector[Fragment]
   var currentAuth : Double = initAuth
   var linkedFrag : Int = 0
   var totalFrag : Int = 0
-  //val uuid :UUID = UUID.randomUUID
 
 
   def setDocNumToFrag(): Unit ={

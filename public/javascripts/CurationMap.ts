@@ -1,16 +1,53 @@
 import {Document} from "./Document";
 import {UuidTextPair} from "./UuidTextPair";
+import {Fragment} from "./Fragment";
+import {Link} from "./Link";
 
 export class CurationMap {
 
+    data :any;
     documents: Document[];
 
-    constructor(documents: Document[]){
-        this.documents = documents;
+    constructor(data : any){
+
+        this.data = data;
+        this.documents = [];
+
+    }
+
+    init(){
+        this.data.documents.sort(function (a: any, b: any) {
+                return (a.hub > b.hub) ? -1 : 1;
+            }
+
+        );
+
+        const docID2UuidMap: { [key: number]: string; } = {};
+
+        let i;
+        for(i = 0 ; i < this.data.documents.length ; i++){
+            docID2UuidMap[this.data.documents[i].docNum] = this.data.documents[i].uuid;
+        }
+
+//CMap作成
+        const docs: Document[] = [];
+        for(const doc of this.data.documents) {
+            const frags: Fragment[] = [];
+            for (const frag of doc.fragments) {
+                const links: Link[] = [];
+                for (const link of frag.links) {
+                    links.push(new Link(link.destDocNum,link.weight, docID2UuidMap[link.destDocNum]));
+                }
+                frags.push(new Fragment(frag.text, links, frag.uuid));
+            }
+            docs.push(new Document(doc.url,doc.title, doc.docNum, frags, docID2UuidMap[doc.docNum]));
+        }
+
+        this.documents = docs;
+
         this.setLinkUuidTexts();
         this.calcDetailSvgY();
     }
-
 
 
     setLinkUuidTexts(){
@@ -42,6 +79,34 @@ export class CurationMap {
             })
         });
         return ret;
+    }
+
+    getLinkUuidFromUuid(uuid: string): string[]{
+        let ret: string[] = [];
+        this.documents.forEach(doc =>{
+            doc.fragments.forEach(frag =>{
+                if(frag.uuid == uuid){
+                    frag.links.forEach( link =>{
+                            ret.push(link.uuid);
+                        }
+                    )
+                }
+            })
+        });
+        return ret;
+
+    }
+
+    setTextOfUuidTextPairFromUuid(uuid: string, text: string): void{
+        this.documents.forEach( doc =>{
+            doc.linkUuidTexts.forEach( lu=>{
+                if(lu.uuid == uuid){
+                    lu.text = text;
+                    lu.setLine();
+
+                }
+            })
+        })
     }
 
     getHitsRankFromUuid(uuid: string): number{

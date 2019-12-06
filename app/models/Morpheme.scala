@@ -8,7 +8,7 @@ case class Morpheme(word: String, morph : String) {
     case _ => morph.split(",")(1)
   }
 
-  println(s"word: $word pos: $pos spos: $spos")
+  //println(s"word: $word pos: $pos spos: $spos")
 
   def getPartsOfSpeech:String ={
     //println(s"$word +++ ${morph.split(",").head}")

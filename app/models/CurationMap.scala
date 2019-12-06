@@ -48,10 +48,10 @@ case class CurationMap(query : String, documents : Vector[Document], alpha : Dou
 
     val weakWeight: Double =
       if (alpha <= beta){
-      alpha
-    }else{
-      beta
-    }
+        alpha
+      }else{
+        beta
+      }
 
     documents.foreach{
       doc =>
@@ -234,11 +234,11 @@ case class CurationMap(query : String, documents : Vector[Document], alpha : Dou
             linkJsons.clear
             frag.links.foreach{
               link =>
-               linkJsons += LinkJson(link.getDestDocNum, link.weight)
+                linkJsons += LinkJson(link.getDestDocNum, link.weight)
             }
-            fragmentJsons += jsons.FragmentJson(frag.getText, linkJsons.toList)
+            fragmentJsons += jsons.FragmentJson(frag.getText, linkJsons.toList, frag.uuid.toString)
         }
-        documentJsons += jsons.DocumentJson(doc.url, doc.title, doc.docNum, doc.currentHub, doc.currentAuth, fragmentJsons.toList)
+        documentJsons += jsons.DocumentJson(doc.url, doc.title, doc.docNum, doc.currentHub, doc.currentAuth, fragmentJsons.toList, doc.uuid.toString)
     }
     jsons.CurationMapJson(query, alpha, beta,documentJsons.toList)
   }
@@ -258,9 +258,9 @@ case class CurationMap(query : String, documents : Vector[Document], alpha : Dou
               link =>
                 linkMorphia += new LinkMorphia(link.getDestDocNum, link.weight)
             }
-            fragmentMorphia += new FragmentMorphia(frag.morphList.toList.asJava,linkMorphia.toList.asJava)
+            fragmentMorphia += new FragmentMorphia(frag.morphList.toList.asJava,linkMorphia.toList.asJava, frag.uuid.toString)
         }
-        documentMorphia += new DocumentMorphia(doc.url, doc.title, doc.docNum, fragmentMorphia.toList.asJava)
+        documentMorphia += new DocumentMorphia(doc.url, doc.title, doc.docNum, fragmentMorphia.toList.asJava, doc.uuid.toString)
     }
     new CurationMapMorphia(query, documentMorphia.toList.asJava)
   }

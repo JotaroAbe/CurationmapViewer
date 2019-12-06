@@ -9,13 +9,14 @@ import play.api.libs.json.{JsValue, Json}
 
 case class CMapFinder(query: String, alpha: Double, beta : Double, ds: Datastore) {
   val res: Query[CurationMapMorphia] = ds.createQuery(classOf[CurationMapMorphia]).field("query").equal(query)
+  val cmapOpt: Option[CurationMap] = getCurationMap
 
   def isNonEmpty: Boolean ={
     res.count() != 0
   }
 
 
- def getCurationMap: Option[CurationMap] = {
+ private def getCurationMap: Option[CurationMap] = {
    if(res.count() != 0){
      Some(Option(res.get()) match {
        case Some(cmap : CurationMapMorphia) =>
@@ -35,7 +36,7 @@ case class CMapFinder(query: String, alpha: Double, beta : Double, ds: Datastore
 
   def getCMapJson: JsValue ={
 
-    getCurationMap match {
+    cmapOpt match {
       case Some(cmap : CurationMap) =>
         Json.toJson(cmap.toJson)
       case _ => Json.toJson("{}")

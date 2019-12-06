@@ -1,8 +1,10 @@
 package controllers
 
+import java.util.UUID
+
 import dataStructures.morphias.MongoDatastoreFactory
 import javax.inject.Inject
-import models.{CurationMap, Query}
+import models._
 import org.mongodb.morphia.Datastore
 import pipeline.CMapFinder
 import play.api.mvc.{AbstractController, ControllerComponents}
@@ -15,6 +17,8 @@ class HomeController  @Inject()(cc: ControllerComponents) (implicit assetsFinder
   extends AbstractController(cc) with I18nSupport{
 
   var dsOpt = Option.empty[Datastore]
+
+  var cmapOpt = Option.empty[CurationMap]
 
   val queryForm = Form( mapping(
     "query" -> nonEmptyText
@@ -85,10 +89,96 @@ class HomeController  @Inject()(cc: ControllerComponents) (implicit assetsFinder
 
       val cMap : CMapFinder = CMapFinder(query, alpha, beta, ds)
 
+      cmapOpt = cMap.cmapOpt
+
       Ok(cMap.getCMapJson)
     }else{
       BadRequest("Header Error")
     }
+
+  }
+
+  def getDestFrag =Action { implicit request =>
+
+    val fragUuid: String = request.getQueryString("frag") match {
+      case Some(uuid : String) => uuid
+      case _ => ""
+    }
+
+    val destUuid: String= request.getQueryString("destdoc") match {
+      case Some(uuid : String) => uuid
+      case _ => ""
+    }
+
+    cmapOpt match {
+      case Some(c : CurationMap) =>
+
+        var initFrag: Fragment = FragNone
+        var destDoc: Document = DocumentNone
+
+        c.documents.foreach{
+          doc =>
+
+            if(doc.uuid.toString == destUuid){
+              destDoc = doc
+            }
+
+
+            doc.fragList.foreach{
+              frag =>
+                if(frag.uuid.toString == fragUuid){
+                  initFrag = frag
+                }
+            }
+        }
+
+        if(initFrag != FragNone && destDoc != DocumentNone){
+          var changeText : String = ""
+          initFrag.links.foreach{
+            link =>
+              if(destDoc.docNum == link.destDocNum){
+
+                //var changeUuid: UUID = null
+
+                var maxInclusive : Double = 0.0
+                destDoc.fragList.foreach{
+                  destFrag =>
+                    val thisInclusive = initFrag.calcInclusive(destFrag)
+                    if(thisInclusive > maxInclusive//&& thisInclusive > CurationMap.ALPHA テキスト断片にしなきゃ爆発するのでとりあえず
+                      && initFrag.getText.length < destFrag.getText.length){
+                      maxInclusive = thisInclusive
+                      changeText = destFrag.getText
+                      //changeUuid = destFrag.uuid
+                    }
+                }
+                if(!changeText.isEmpty) {
+                  //link.destText = changeText
+                  //link.destUuid = changeUuid
+                }
+                //println(s"Doc${doc.docNum} -> $changeText")
+              }
+          }
+          Ok(changeText)
+        }else{
+          val u = UUID.randomUUID()
+
+          println(u)
+
+          val f = Fragment(Vector.empty[Morpheme], u)
+
+          println(f.uuid)
+
+
+          BadRequest(initFrag.getClass.getCanonicalName+ " " + destDoc.getClass.getCanonicalName)
+        }
+
+
+
+
+      case _ => BadRequest("Internal Curationmap is not found")
+    }
+
+
 
   }
 
