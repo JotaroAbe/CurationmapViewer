@@ -44,15 +44,15 @@ export class Document{
             ret = detailHeight;
         }
 
-        return ret * SvgDrawer.CHAR_SIZE + SvgDrawer.PADDING * 2;
+        return ret * SvgDrawer.CHAR_SIZE　* SvgDrawer.LINE_SPACE_RATE  + SvgDrawer.PADDING * 2 + SvgDrawer.HEIGHT_MARGIN;
     }
 
     calcMatomeSvgY(): void{
-        let i = 0;
+        let i = 1;
         this.fragments.forEach(frag => {
-            frag.svgY = i * SvgDrawer.CHAR_SIZE + SvgDrawer.PADDING;
+            frag.svgY = i * SvgDrawer.CHAR_SIZE * SvgDrawer.LINE_SPACE_RATE + SvgDrawer.PADDING;
             frag.lines.forEach(line => {
-                line.svgY = i * SvgDrawer.CHAR_SIZE + SvgDrawer.PADDING;
+                line.svgY = i * SvgDrawer.CHAR_SIZE * SvgDrawer.LINE_SPACE_RATE + SvgDrawer.PADDING;
                 i++;
             });
             i += SvgDrawer.FRAG_MARGIN;
@@ -78,9 +78,9 @@ export class Document{
 
         let i = 0;
         this.linkUuidTexts.forEach( uuidText =>{
-            uuidText.svgY = i * SvgDrawer.CHAR_SIZE + SvgDrawer.PADDING;
+            uuidText.svgY = i * SvgDrawer.CHAR_SIZE * SvgDrawer.LINE_SPACE_RATE  + SvgDrawer.PADDING;
             uuidText.lines.forEach(line => {
-                line.svgY = i * SvgDrawer.CHAR_SIZE + SvgDrawer.PADDING;
+                line.svgY = i * SvgDrawer.CHAR_SIZE * SvgDrawer.LINE_SPACE_RATE  + SvgDrawer.PADDING;
                 i++;
             });
             i += detailMargin;
@@ -114,7 +114,7 @@ export class Document{
     getMatomeBoxSvgData(): [number, number, string][]{//height,y,uuidの配列
         const ret: [number,number, string][] = [];
         this.fragments.forEach(frag => {
-            ret.push([(frag.lines.length + SvgDrawer.FRAG_MARGIN - SvgDrawer.BOX_MARGIN)* SvgDrawer.CHAR_SIZE, frag.svgY - SvgDrawer.PADDING, frag.uuid]);
+            ret.push([(frag.lines.length * SvgDrawer.LINE_SPACE_RATE  + SvgDrawer.FRAG_MARGIN - SvgDrawer.BOX_MARGIN)* SvgDrawer.CHAR_SIZE, frag.svgY - SvgDrawer.PADDING, frag.uuid]);
         });
         return ret;
     }
@@ -138,11 +138,11 @@ export class Document{
                 uuidText.lines.forEach(line => {
                     if(destUuid == uuidText.uuid){
                         ret.push([line.text, currentY, uuidText.uuid]);
-                        currentY += SvgDrawer.CHAR_SIZE;
+                        currentY += SvgDrawer.CHAR_SIZE * SvgDrawer.LINE_SPACE_RATE;
                     }
                 })
             });
-            currentY += SvgDrawer.FRAG_MARGIN * SvgDrawer.CHAR_SIZE
+            currentY += SvgDrawer.FRAG_MARGIN * SvgDrawer.CHAR_SIZE * SvgDrawer.LINE_SPACE_RATE
         });
 
 
@@ -153,7 +153,7 @@ export class Document{
     getDetailBoxSvgData(): [number, number, string][]{
         const ret: [number, number, string][] = [];
         this.linkUuidTexts.forEach( uuidText => {
-            ret.push([(uuidText.lines.length + SvgDrawer.FRAG_MARGIN - SvgDrawer.BOX_MARGIN)* SvgDrawer.CHAR_SIZE, uuidText.svgY - SvgDrawer.PADDING, uuidText.uuid]);
+            ret.push([(uuidText.lines.length + SvgDrawer.FRAG_MARGIN - SvgDrawer.BOX_MARGIN)* SvgDrawer.CHAR_SIZE* SvgDrawer.LINE_SPACE_RATE , uuidText.svgY - SvgDrawer.PADDING, uuidText.uuid]);
         });
 
         return ret;
@@ -167,8 +167,8 @@ export class Document{
         destUuids.forEach(destUuid=>{
             this.linkUuidTexts.forEach( uuidText => {
                 if(destUuid == uuidText.uuid) {
-                    ret.push([(uuidText.lines.length + SvgDrawer.FRAG_MARGIN - SvgDrawer.BOX_MARGIN) * SvgDrawer.CHAR_SIZE, currentY, uuidText.uuid]);
-                    currentY += uuidText.lines.length * SvgDrawer.CHAR_SIZE + SvgDrawer.FRAG_MARGIN * SvgDrawer.CHAR_SIZE;
+                    ret.push([(uuidText.lines.length + SvgDrawer.FRAG_MARGIN - SvgDrawer.BOX_MARGIN) * SvgDrawer.CHAR_SIZE * SvgDrawer.LINE_SPACE_RATE, currentY, uuidText.uuid]);
+                    currentY += (uuidText.lines.length + SvgDrawer.FRAG_MARGIN) * SvgDrawer.CHAR_SIZE * SvgDrawer.LINE_SPACE_RATE;
                 }
             });
         });
@@ -186,7 +186,7 @@ export class Document{
 
                 const x1 = SvgDrawer.ONE_LINE_CHAR * SvgDrawer.CHAR_SIZE + SvgDrawer.PADDING;
                 const y1 = frag.svgY + frag.lines.length * SvgDrawer.CHAR_SIZE / 2 - SvgDrawer.CHAR_SIZE / 2;
-                const x2 = SvgDrawer.SVG_WIDTH- SvgDrawer.ONE_LINE_CHAR * SvgDrawer.CHAR_SIZE - SvgDrawer.PADDING * 2;
+                const x2 = SvgDrawer.SVG_WIDTH- SvgDrawer.ONE_LINE_CHAR * SvgDrawer.CHAR_SIZE * SvgDrawer.DETAIL_LINE_RATE - SvgDrawer.PADDING * 2;
                 const y2 = this.getDestLinkBoxSvgY(link.uuid);
 
                 axises.push(new Axis(x1, y1));

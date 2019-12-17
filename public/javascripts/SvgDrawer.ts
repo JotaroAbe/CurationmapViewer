@@ -13,7 +13,9 @@ export class SvgDrawer{
     static BOX_MARGIN = 1;//行
     static SVG_WIDTH = window.innerWidth;
     static ONE_LINE_CHAR = Math.round((SvgDrawer.SVG_WIDTH - SvgDrawer.PADDING) / 2.5 / SvgDrawer.CHAR_SIZE);
-
+    static LINE_SPACE_RATE = 1.5;
+    static DETAIL_LINE_RATE = 0.5;
+    static HEIGHT_MARGIN = 500;
 
     drawMainSvg(cMap: CurationMap, hubNum: number): void{
 
@@ -31,6 +33,25 @@ export class SvgDrawer{
             .append("svg")
             .attr("width", svgWidth)
             .attr("height", svgHeight);
+
+// #drop-shadow　という ID のフィルタを定義
+        const filter = svg.append("defs")
+            .append("filter")
+            .attr("id", "drop-shadow")
+            .attr("height", "130%");
+
+// 元となるSVG要素をぼかして影を作る
+        const feGaussianBlur = filter.append("feGaussianBlur")
+            .attr("in", "SourceAlpha")
+            .attr("stdDeviation", 3)
+            .attr("result", "blur");
+
+// 2つの入力画像 (元のSVG要素と影) を重ねて表示
+        filter.append("feBlend")
+            .attr("in", "SourceGraphic")
+            .attr("in2", "blurOut")
+            .attr("mode", "normal");
+
 
         const matomeBoxSvgData = treeData.getMatomeBoxSvgData();
         const matomeTextSvgData = treeData.getMatomeTextSvgData();
@@ -61,9 +82,11 @@ export class SvgDrawer{
                 .attr("class", d => "matomeBoxes")
                 .attr("x", SvgDrawer.PADDING / 2)
                 .attr("y", d => d[1] )//svgY
+                .attr("rx", 10)
+                .attr("ry", 10)
                 .attr("width", SvgDrawer.ONE_LINE_CHAR * SvgDrawer.CHAR_SIZE + SvgDrawer.PADDING / 2)
-                .attr("height", d => d[0] );//boxHeight
-
+                .attr("height", d => d[0] )//boxHeight
+                .style("filter", "url(#drop-shadow)");
             const fragMatomeText: [string, number, string][] = [];
             matomeTextSvgData.forEach(matomeText => {
                 if (matomeText[2] == matomeBox[2]) {
@@ -96,9 +119,9 @@ export class SvgDrawer{
                 .enter()
                 .append("rect")
                 .attr("class", "detailBoxes")
-                .attr("x", svgWidth - SvgDrawer.ONE_LINE_CHAR * SvgDrawer.CHAR_SIZE - SvgDrawer.PADDING * 2)
+                .attr("x", svgWidth - SvgDrawer.ONE_LINE_CHAR * SvgDrawer.CHAR_SIZE * SvgDrawer.DETAIL_LINE_RATE - SvgDrawer.PADDING * 2)
                 .attr("y", d => d[1] )//svgY
-                .attr("width", SvgDrawer.ONE_LINE_CHAR * SvgDrawer.CHAR_SIZE + SvgDrawer.PADDING / 2)
+                .attr("width", SvgDrawer.ONE_LINE_CHAR * SvgDrawer.CHAR_SIZE * SvgDrawer.DETAIL_LINE_RATE + SvgDrawer.PADDING / 2)
                 .attr("height", d => d[0] )//boxHeight
                 .attr("stroke", d => d3.interpolateRainbow(( d[1] * 2 + d[0] ) / 2 / svgHeight))
                 .attr("fill", d => d3.interpolateRainbow(( d[1] * 2 + d[0] ) / 2 / svgHeight));
@@ -115,7 +138,7 @@ export class SvgDrawer{
                 .append("text")
                 .attr("class", "detailTexts")
                 .text(d => d[0])//text
-                .attr("x", svgWidth - SvgDrawer.ONE_LINE_CHAR * SvgDrawer.CHAR_SIZE - SvgDrawer.PADDING * 2)
+                .attr("x", svgWidth - SvgDrawer.ONE_LINE_CHAR * SvgDrawer.CHAR_SIZE * SvgDrawer.DETAIL_LINE_RATE - SvgDrawer.PADDING * 2)
                 .attr("y", d => d[1])//svgY
                 .attr("font-size", SvgDrawer.CHAR_SIZE+"px");
         });
@@ -215,9 +238,11 @@ export class SvgDrawer{
             .attr("class", "clickBoxes")
             .attr("x", SvgDrawer.PADDING / 2)
             .attr("y", y)
+            .attr("rx", 10)
+            .attr("ry", 10)
             .attr("width", SvgDrawer.ONE_LINE_CHAR * SvgDrawer.CHAR_SIZE + SvgDrawer.PADDING / 2)
-            .attr("height", (matomeTextData.length + SvgDrawer.FRAG_MARGIN - SvgDrawer.BOX_MARGIN) * SvgDrawer.CHAR_SIZE);
-
+            .attr("height", (matomeTextData.length + SvgDrawer.FRAG_MARGIN - SvgDrawer.BOX_MARGIN) * SvgDrawer.CHAR_SIZE * SvgDrawer.LINE_SPACE_RATE)
+            .style("filter", "url(#drop-shadow)");
         const matomeLinkSvgY = y + ((matomeTextData.length + SvgDrawer.FRAG_MARGIN - SvgDrawer.BOX_MARGIN) * SvgDrawer.CHAR_SIZE ) / 2;
 
         fragG.selectAll("clickmatometext")
@@ -245,10 +270,13 @@ export class SvgDrawer{
 
             detailFragG.append("rect")
                 .attr("class", "clickBoxes")
-                .attr("x", SvgDrawer.SVG_WIDTH - SvgDrawer.ONE_LINE_CHAR * SvgDrawer.CHAR_SIZE - SvgDrawer.PADDING * 2)
+                .attr("x", SvgDrawer.SVG_WIDTH - SvgDrawer.ONE_LINE_CHAR * SvgDrawer.CHAR_SIZE * SvgDrawer.DETAIL_LINE_RATE - SvgDrawer.PADDING * 2)
                 .attr("y", y + boxData[1])
-                .attr("width", SvgDrawer.ONE_LINE_CHAR * SvgDrawer.CHAR_SIZE + SvgDrawer.PADDING / 2)
-                .attr("height", boxData[0]);
+                .attr("rx", 10)
+                .attr("ry", 10)
+                .attr("width", SvgDrawer.ONE_LINE_CHAR * SvgDrawer.CHAR_SIZE * SvgDrawer.DETAIL_LINE_RATE + SvgDrawer.PADDING / 2)
+                .attr("height", boxData[0])
+                .style("filter", "url(#drop-shadow)");
 
             const simpleDetailTextSvgData: [string,number][] =[];
             detailTextSvgData.forEach(textData=>{
@@ -263,7 +291,7 @@ export class SvgDrawer{
                 .append("text")
                 .attr("class", "clickTexts")
                 .text((d:[string, number]) => d[0])//text
-                .attr("x", SvgDrawer.SVG_WIDTH - SvgDrawer.ONE_LINE_CHAR * SvgDrawer.CHAR_SIZE - SvgDrawer.PADDING * 2)
+                .attr("x", SvgDrawer.SVG_WIDTH - SvgDrawer.ONE_LINE_CHAR * SvgDrawer.CHAR_SIZE * SvgDrawer.DETAIL_LINE_RATE - SvgDrawer.PADDING * 2)
                 .attr("y", (d:[string, number])  => y + d[1] + SvgDrawer.CHAR_SIZE)//svgY
                 .attr("font-size", SvgDrawer.CHAR_SIZE + "px");
 
@@ -289,7 +317,7 @@ export class SvgDrawer{
 
             const x1 = SvgDrawer.ONE_LINE_CHAR * SvgDrawer.CHAR_SIZE + SvgDrawer.PADDING;
             const y1 = matomeLinkSvgY;
-            const x2 = SvgDrawer.SVG_WIDTH- SvgDrawer.ONE_LINE_CHAR * SvgDrawer.CHAR_SIZE - SvgDrawer.PADDING * 2;
+            const x2 = SvgDrawer.SVG_WIDTH- SvgDrawer.ONE_LINE_CHAR * SvgDrawer.CHAR_SIZE * SvgDrawer.DETAIL_LINE_RATE - SvgDrawer.PADDING * 2;
             const y2 = destSvgY;
 
             axises.push(new Axis(x1, y1));

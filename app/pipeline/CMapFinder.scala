@@ -22,8 +22,8 @@ case class CMapFinder(query: String, alpha: Double, beta : Double, ds: Datastore
        case Some(cmap : CurationMapMorphia) =>
          val ret = Morphia2Scala().convert(cmap, alpha, beta)
          ret.deleteWeakLink()
-         ret.genSplitLink()
-         ret.mergeLink()
+         //ret.genSplitLink()
+         //ret.mergeLink()
          ret.calcHits()
          ret
        case _ => null

@@ -3,11 +3,12 @@ package models
 import java.util.UUID
 
 import org.apache.lucene.search.Weight
+import tools.UniqueId
 
 import scala.collection.immutable.List
 import scala.collection.mutable
 
-case class Fragment (morphList: Vector[Morpheme], uuid :UUID = UUID.randomUUID){
+case class Fragment (morphList: Vector[Morpheme], id :Long = UniqueId.getInstance().createId()){
 
   var docNum : Int = Document.docNumNone
 
@@ -89,7 +90,7 @@ case class Fragment (morphList: Vector[Morpheme], uuid :UUID = UUID.randomUUID){
 
 
   def +(rearFrag : Fragment) :Fragment ={
-    val mergedFrag = Fragment(Vector.concat(morphList, rearFrag.morphList), this.uuid)
+    val mergedFrag = Fragment(Vector.concat(morphList, rearFrag.morphList), this.id)
 
     mergedFrag.docNum = docNum
     this.links.foreach{

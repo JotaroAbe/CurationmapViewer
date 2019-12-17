@@ -11,6 +11,7 @@ import play.api.mvc.{AbstractController, ControllerComponents}
 import play.api.data._
 import play.api.data.Forms._
 import play.api.i18n.I18nSupport
+import tools.UniqueId
 
 
 class HomeController  @Inject()(cc: ControllerComponents) (implicit assetsFinder: AssetsFinder)
@@ -119,14 +120,14 @@ class HomeController  @Inject()(cc: ControllerComponents) (implicit assetsFinder
         c.documents.foreach{
           doc =>
 
-            if(doc.uuid.toString == destUuid){
+            if(doc.id.toString == destUuid){
               destDoc = doc
             }
 
 
             doc.fragList.foreach{
               frag =>
-                if(frag.uuid.toString == fragUuid){
+                if(frag.id.toString == fragUuid){
                   initFrag = frag
                 }
             }
@@ -160,13 +161,13 @@ class HomeController  @Inject()(cc: ControllerComponents) (implicit assetsFinder
           }
           Ok(changeText)
         }else{
-          val u = UUID.randomUUID()
+          val u = UniqueId.getInstance().createId()
 
           println(u)
 
           val f = Fragment(Vector.empty[Morpheme], u)
 
-          println(f.uuid)
+          println(f.id)
 
 
           BadRequest(initFrag.getClass.getCanonicalName+ " " + destDoc.getClass.getCanonicalName)

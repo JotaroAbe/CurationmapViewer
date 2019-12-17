@@ -2,11 +2,11 @@ package models
 
 import java.util.UUID
 
-import tools.LinkMerger
+import tools.{LinkMerger, UniqueId}
 
 import scala.collection.mutable
 
-case class Document (url: String, title: String, var fragList : Vector[Fragment],var docNum : Int, uuid :UUID = UUID.randomUUID){
+case class Document (url: String, title: String, var fragList : Vector[Fragment], var docNum : Int, id :Long = UniqueId.getInstance().createId()){
   val initHub : Double = 1
   val initAuth : Double = 1
   var preHub : Double = initHub
