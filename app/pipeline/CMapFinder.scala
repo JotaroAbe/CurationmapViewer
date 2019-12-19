@@ -1,13 +1,12 @@
 package pipeline
 
-import dataStructures.jsons.CurationMapJson
 import dataStructures.morphias.{CurationMapMorphia, Morphia2Scala}
 import models.CurationMap
 import org.mongodb.morphia.Datastore
 import org.mongodb.morphia.query.Query
 import play.api.libs.json.{JsValue, Json}
 
-case class CMapFinder(query: String, alpha: Double, beta : Double, ds: Datastore) {
+case class CMapFinder(query: String, alpha: Double, beta : Double, ds: Datastore, isMerge: Boolean = true, isGenSplitLink: Boolean = true) {
   val res: Query[CurationMapMorphia] = ds.createQuery(classOf[CurationMapMorphia]).field("query").equal(query)
   val cmapOpt: Option[CurationMap] = getCurationMap
 
@@ -22,8 +21,12 @@ case class CMapFinder(query: String, alpha: Double, beta : Double, ds: Datastore
        case Some(cmap : CurationMapMorphia) =>
          val ret = Morphia2Scala().convert(cmap, alpha, beta)
          ret.deleteWeakLink()
-         //ret.genSplitLink()
-         //ret.mergeLink()
+         if(isGenSplitLink){
+           ret.genSplitLink()
+         }
+         if(isMerge){
+           ret.mergeLink()
+         }
          ret.calcHits()
          ret
        case _ => null

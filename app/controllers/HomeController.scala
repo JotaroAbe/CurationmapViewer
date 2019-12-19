@@ -7,7 +7,7 @@ import javax.inject.Inject
 import models._
 import org.mongodb.morphia.Datastore
 import pipeline.CMapFinder
-import play.api.mvc.{AbstractController, ControllerComponents}
+import play.api.mvc.{AbstractController, ControllerComponents, WrappedRequest}
 import play.api.data._
 import play.api.data.Forms._
 import play.api.i18n.I18nSupport
@@ -78,6 +78,24 @@ class HomeController  @Inject()(cc: ControllerComponents) (implicit assetsFinder
         b.toDoubleOrElse()
       case _ => -1D
     }
+    val isMerge: Boolean = request.getQueryString("merge") match {
+      case Some(ism: String) =>
+        if(ism == "true"){
+          true
+        }else{
+          false
+        }
+      case _ => false
+    }
+    val isGenSplitLink: Boolean = request.getQueryString("gensplitlink") match {
+      case Some(isg: String) =>
+        if(isg == "true"){
+          true
+        }else{
+          false
+        }
+      case _ => false
+    }
 
     if(!query.isEmpty && alpha >= 0.0 && alpha <= 1.0 && beta >= 0.0 && beta <= 1.0){
 
@@ -88,7 +106,7 @@ class HomeController  @Inject()(cc: ControllerComponents) (implicit assetsFinder
           newDataStore
       }
 
-      val cMap : CMapFinder = CMapFinder(query, alpha, beta, ds)
+      val cMap : CMapFinder = CMapFinder(query, alpha, beta, ds, isMerge, isGenSplitLink)
 
       cmapOpt = cMap.cmapOpt
 
@@ -146,7 +164,8 @@ class HomeController  @Inject()(cc: ControllerComponents) (implicit assetsFinder
                   destFrag =>
                     val thisInclusive = initFrag.calcInclusive(destFrag)
                     if(thisInclusive > maxInclusive//&& thisInclusive > CurationMap.ALPHA テキスト断片にしなきゃ爆発するのでとりあえず
-                      && initFrag.getText.length < destFrag.getText.length){
+                    //&& initFrag.getText.length < destFrag.getText.length
+                    ){
                       maxInclusive = thisInclusive
                       changeText = destFrag.getText
                       //changeUuid = destFrag.uuid

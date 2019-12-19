@@ -58,7 +58,7 @@ case class LinkMerger(preFrag: Fragment, rearFrag: Fragment, currentFragList : V
       mergedLinks += pl + rl
     }
 
-    mergedFrag = preFrag + rearFrag
+    mergedFrag = preFrag + (rearFrag, beta)
   }
 
 }

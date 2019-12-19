@@ -104,32 +104,32 @@ case class CurationMap(query : String, documents : Vector[Document], alpha : Dou
   def mergeLink(): Unit ={
     println("リンク併合中...")
     var loop : Boolean = false
-    var i = 0
 
-    do{
-      loop = false
-
+    do {
+      loop =false
       documents.foreach {
         doc =>
           var preFrag: Fragment = FragNone
           var currentFragList = doc.fragList
           doc.fragList.foreach {
             frag =>
-              val lm = LinkMerger(preFrag, frag, currentFragList, beta)
-              preFrag = frag
-              currentFragList = lm.getNewFragList
+              if(!loop){
 
-              if (lm.isMerge) {
-                //loop = true
+                val lm = LinkMerger(preFrag, frag, currentFragList, beta)
+                preFrag = frag
+
+                if (lm.isMerge) {
+                  currentFragList = lm.getNewFragList
+                  loop = true
+                }
               }
           }
 
           doc.fragList = currentFragList
-
-
       }
-      i = i + 1
-    }while(i < 3)//とりあえず無限ループしないよう
+    }while(loop)
+
+
   }
 
   def calcHits(): Unit= {

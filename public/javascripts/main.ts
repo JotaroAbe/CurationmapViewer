@@ -45,7 +45,9 @@ function getMap(alpha : number, beta : number) {
             data: {
                 query : query,
                 alpha : alpha,
-                beta : beta
+                beta : beta,
+                merge : $("#isMergeCheck").prop("checked"),
+                gensplitlink : $("#isGenSplitLink").prop("checked")
             }
         })
         .done(

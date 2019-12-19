@@ -1,8 +1,5 @@
 package models
 
-import java.util.UUID
-
-import org.apache.lucene.search.Weight
 import tools.UniqueId
 
 import scala.collection.immutable.List
@@ -37,11 +34,11 @@ case class Fragment (morphList: Vector[Morpheme], id :Long = UniqueId.getInstanc
   }
 
 
-  def hasLink(docNum : Int, alpha : Double): Boolean ={
+  def hasLink(docNum : Int, weight : Double): Boolean ={
     var ret : Boolean = false
     links.foreach{
       link =>
-        if(link.getDestDocNum == docNum && link.weight >= alpha){
+        if(link.getDestDocNum == docNum && link.weight >= weight){
           ret = true
         }
     }
@@ -54,10 +51,10 @@ case class Fragment (morphList: Vector[Morpheme], id :Long = UniqueId.getInstanc
       val inclusiveScore: Double = calcInclusive(destDoc)
       //println(s"$inclusiveScore")
       //if (inclusiveScore >= CurationMap.ALPHA) {
-        println(s"Doc${this.docNum} -> Doc${destDoc.docNum} Weight: $inclusiveScore")
-        link = InclusiveLink(inclusiveScore, destDoc.docNum)
+      println(s"Doc${this.docNum} -> Doc${destDoc.docNum} Weight: $inclusiveScore")
+      link = InclusiveLink(inclusiveScore, destDoc.docNum)
       //} else {
-        //frag.links += NoneLink(doc.docNum)
+      //frag.links += NoneLink(doc.docNum)
       //}
     }else{
       //frag.links += NoneLink(doc.docNum)
@@ -89,18 +86,16 @@ case class Fragment (morphList: Vector[Morpheme], id :Long = UniqueId.getInstanc
   }
 
 
-  def +(rearFrag : Fragment) :Fragment ={
+  def +(rearFrag : Fragment, beta : Double) :Fragment ={
     val mergedFrag = Fragment(Vector.concat(morphList, rearFrag.morphList), this.id)
 
     mergedFrag.docNum = docNum
     this.links.foreach{
       preLink =>
-        rearFrag.links.foreach{
-          rearLink=>
-          if(preLink.destDocNum == rearLink.destDocNum){
-            mergedFrag.links += preLink + rearLink
-          }
+        if(rearFrag.hasLink(preLink.destDocNum, beta)){
+          mergedFrag.links += preLink
         }
+
     }
     mergedFrag
   }
