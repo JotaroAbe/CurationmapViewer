@@ -178,7 +178,8 @@ export class SvgDrawer{
                             async : false
                         })
                         .done(function (data) {
-                            cMap.setTextOfUuidTextPairFromUuid(du, data);
+                            cMap.setTextOfUuidTextPairFromUuid(du,
+                                new DOMParser().parseFromString(data, "text/html").documentElement.textContent as string);
                         })
                         .fail(function (data) {
                             console.log(data)

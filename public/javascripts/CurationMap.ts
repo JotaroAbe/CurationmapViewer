@@ -50,6 +50,7 @@ export class CurationMap {
     }
 
 
+
     setLinkUuidTexts(){
         this.documents.forEach(doc =>{
             if(doc.linkUuidTexts.length == 0) {

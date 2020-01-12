@@ -10,7 +10,7 @@ export class Fragment {
     lines: Line[] = [];
 
     constructor(text : string, links : Link[], uuid: string){
-        this.text = text;
+        this.text = new DOMParser().parseFromString(text, "text/html").documentElement.textContent as string;
         this.links = links;
         this.uuid = uuid;
     }

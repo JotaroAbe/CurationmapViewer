@@ -1,13 +1,15 @@
 package pipeline
 
-import dataStructures.morphias.{CurationMapMorphia, Morphia2Scala}
+import dataStructures.morphias.{DocumentMorphia, Morphia2Scala}
+import dev.morphia.Datastore
+import dev.morphia.query.Query
 import models.CurationMap
-import org.mongodb.morphia.Datastore
-import org.mongodb.morphia.query.Query
 import play.api.libs.json.{JsValue, Json}
 
+import scala.collection.mutable
+
 case class CMapFinder(query: String, alpha: Double, beta : Double, ds: Datastore, isMerge: Boolean = true, isGenSplitLink: Boolean = true) {
-  val res: Query[CurationMapMorphia] = ds.createQuery(classOf[CurationMapMorphia]).field("query").equal(query)
+  val res: Query[DocumentMorphia] = ds.createQuery(classOf[DocumentMorphia]).field("query").equal(query)
   val cmapOpt: Option[CurationMap] = getCurationMap
 
   def isNonEmpty: Boolean ={
@@ -15,26 +17,29 @@ case class CMapFinder(query: String, alpha: Double, beta : Double, ds: Datastore
   }
 
 
- private def getCurationMap: Option[CurationMap] = {
-   if(res.count() != 0){
-     Some(Option(res.get()) match {
-       case Some(cmap : CurationMapMorphia) =>
-         val ret = Morphia2Scala().convert(cmap, alpha, beta)
-         ret.deleteWeakLink()
-         if(isGenSplitLink){
-           ret.genSplitLink()
-         }
-         if(isMerge){
-           ret.mergeLink()
-         }
-         ret.calcHits()
-         ret
-       case _ => null
-     })
-   }else{
-     None
-   }
- }
+  private def getCurationMap: Option[CurationMap] = {
+    if(res.count() != 0){
+
+      val documentMorphias = mutable.MutableList.empty[DocumentMorphia]
+
+      res.asList().forEach{
+        docm : DocumentMorphia=>
+          documentMorphias += docm
+      }
+      val ret = Morphia2Scala().convert(documentMorphias.toList, alpha, beta)
+      ret.deleteWeakLink()
+      if(isGenSplitLink){
+        ret.genSplitLink()
+      }
+      if(isMerge){
+        ret.mergeLink()
+      }
+      ret.calcHits()
+      Some(ret)
+    }else{
+      None
+    }
+  }
 
 
   def getCMapJson: JsValue ={
